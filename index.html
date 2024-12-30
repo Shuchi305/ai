@@ -1,0 +1,170 @@
+<html>
+  <head>
+    <base href="./">
+    <title>CryptoEvents - Upcoming Blockchain & Crypto Gatherings</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>CryptoEvents</h1>
+        <p>Discover the latest blockchain and crypto conferences worldwide</p>
+      </div>
+    </header>
+
+    <main class="container">
+      <input type="text" class="search-bar" placeholder="Search events by name, location, or type..." id="searchInput">
+      
+      <div class="view-controls">
+        <button class="view-btn active" data-view="grid">
+          <i class="fas fa-th"></i> Grid
+        </button>
+        <button class="view-btn" data-view="list">
+          <i class="fas fa-list"></i> List
+        </button>
+      </div>
+
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All Events</button>
+        <button class="filter-btn" data-filter="conference">Conferences</button>
+        <button class="filter-btn" data-filter="hackathon">Hackathons</button>
+        <button class="filter-btn" data-filter="meetup">Meetups</button>
+      </div>
+
+      <div class="events-grid" id="eventsContainer">
+        <!-- Events will be dynamically populated here -->
+      </div>
+    </main>
+
+    <script>
+      const events = [
+        {
+          date: "2024-02-15",
+          title: "ETH Denver 2024",
+          location: "Denver, Colorado",
+          type: "conference",
+          tags: ["Ethereum", "DeFi", "Web3"]
+        },
+        {
+          date: "2024-03-01",
+          title: "Bitcoin Miami Conference",
+          location: "Miami, Florida",
+          type: "conference",
+          tags: ["Bitcoin", "Mining", "Investment"]
+        },
+        {
+          date: "2024-03-15",
+          title: "Web3 Builders Hackathon",
+          location: "Virtual Event",
+          type: "hackathon",
+          tags: ["Development", "DApps", "Smart Contracts"]
+        },
+        {
+          date: "2024-04-05",
+          title: "Crypto Community Meetup",
+          location: "London, UK",
+          type: "meetup",
+          tags: ["Networking", "Education", "Trading"]
+        }
+      ];
+
+      let currentView = 'grid';
+      let currentFilter = 'all';
+
+      function formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric'
+        });
+      }
+
+      function renderEvents(filteredEvents = events) {
+        const eventsContainer = document.getElementById('eventsContainer');
+        eventsContainer.innerHTML = '';
+        eventsContainer.className = currentView === 'grid' ? 'events-grid' : 'events-list';
+
+        filteredEvents.forEach(event => {
+          const eventCard = document.createElement('div');
+          eventCard.className = 'event-card';
+          
+          if (currentView === 'grid') {
+            eventCard.innerHTML = `
+              <div class="event-date">${formatDate(event.date)}</div>
+              <h3 class="event-title">${event.title}</h3>
+              <div class="event-location">${event.location}</div>
+              <div class="event-tags">
+                ${event.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+              </div>
+            `;
+          } else {
+            eventCard.innerHTML = `
+              <div class="event-date">${formatDate(event.date)}</div>
+              <div class="event-info">
+                <h3 class="event-title">${event.title}</h3>
+                <div class="event-location">${event.location}</div>
+                <div class="event-tags">
+                  ${event.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                </div>
+              </div>
+            `;
+          }
+          
+          eventsContainer.appendChild(eventCard);
+        });
+      }
+
+      // View toggle functionality
+      document.querySelectorAll('.view-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          currentView = button.dataset.view;
+          filterAndRenderEvents();
+        });
+      });
+
+      // Filter functionality
+      document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+          button.classList.add('active');
+          currentFilter = button.dataset.filter;
+          filterAndRenderEvents();
+        });
+      });
+
+      function filterAndRenderEvents() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        let filteredEvents = events;
+
+        // Apply type filter
+        if (currentFilter !== 'all') {
+          filteredEvents = filteredEvents.filter(event => event.type === currentFilter);
+        }
+
+        // Apply search filter
+        if (searchTerm) {
+          filteredEvents = filteredEvents.filter(event => 
+            event.title.toLowerCase().includes(searchTerm) ||
+            event.location.toLowerCase().includes(searchTerm) ||
+            event.type.toLowerCase().includes(searchTerm) ||
+            event.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+          );
+        }
+
+        renderEvents(filteredEvents);
+      }
+
+      // Search functionality
+      document.getElementById('searchInput').addEventListener('input', filterAndRenderEvents);
+
+      // Initial render
+      renderEvents();
+    </script>
+  </body>
+</html>
